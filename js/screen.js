@@ -56,6 +56,12 @@
 
 				this.objects.push(obstacle);
 				this.addChild(obstacle);
+			} else if (objectData.type == 'text') {
+				var text = new createjs.Text(objectData.text, "24px Quantico", objectData.color);
+
+				text.x = objectData.x;
+				text.y = objectData.y;
+				this.addChild(text);
 			}
 		}
 	}

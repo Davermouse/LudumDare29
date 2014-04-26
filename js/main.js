@@ -68,6 +68,22 @@ var screens = [
 			height: 40,
 			rotation: 70,
 			color: 'gray'
+		},
+		{
+			type: 'obstacle',
+			x: 0.5 * Globals.stageWidth,
+			y: 420,
+			width: 20,
+			height: 20,
+			rotation: 39,
+			color: 'gray'
+		},
+		{
+			type: 'text',
+			x: 50,
+			y: 50,
+			text: "'Beneath the surface?'",
+			color: 'white'
 		}
 	],
 	player: {
@@ -89,24 +105,56 @@ var screens = [
 	noise: {
 		speed: -1.2,
 		depth: 0.3,
-		backgroundColor: 'rgb(145, 145, 145)'
+		backgroundColor: 'rgb(17,0, 97)'
 	},
+	objects: [
+			{
+			type: 'text',
+			x: 50,
+			y: 50,
+			text: "'Beneath the surface?'",
+			color: 'rgb(200,200,200)'
+		},
+		{
+			type: 'text',
+			x: 70,
+			y: 90,
+			text: "It was a reasonable question.",
+			color: 'white'
+		},{
+			type: 'obstacle',
+			x: 0.5 * Globals.stageWidth,
+			y: 420,
+			width: 60,
+			height: 60,
+			rotation: 25,
+			color: 'darkgray'
+		},{
+			type: 'obstacle',
+			x: 0.2 * Globals.stageWidth,
+			y: 400,
+			width: 80,
+			height: 70,
+			rotation: 36,
+			color: 'darkgray'
+		}
+	],
 	numPeople: 15,
 	basePersonSpeed: 1.2
 },
 {
 	sky: {
 		color: 'rgb(0, 108, 192)',
-		height: 170
+		height: 180
 	},
 	land: {
 		color: 'rgb(60,60,0)',
-		height: 150
+		height: 175
 	},
 	noise: {
 		speed: -1.5,
 		depth: 0.3,
-		backgroundColor: 'rgb(145, 145, 145)'
+		backgroundColor: 'rgb(14,0, 85)'
 	},
 	objects: [
 		{
@@ -121,23 +169,32 @@ var screens = [
 {
 	sky: {
 		color: '#005699',
-		height: 160
+		height: 170
 	},
 	land: {
 		color: '#5B5B33',
-		height: 130
+		height: 155
 	},
 	noise: {
 		speed: -1.9,
 		depth: 0.3,
-		backgroundColor: 'rgb(145, 145, 145)'
+		backgroundColor: 'rgb(10,0, 70)'
 	},
+	objects: [
+	{
+		type: 'text',
+		x: 60,
+		y: 60,
+		text: 'But maybe one for a simpler time',
+		color: 'white'
+	}
+	],
 	numPeople: 10,
 	basePersonSpeed: 1.4
 },
 {
 	sky: {
-		color: '#005699',
+		color: '#6BCDFF',
 		height: 140
 	},
 	land: {
@@ -147,24 +204,24 @@ var screens = [
 	noise: {
 		speed: -2.3,
 		depth: 0.3,
-		backgroundColor: 'rgb(145, 145, 145)'
+		backgroundColor: 'rgb(6, 0, 55)'
 	},
 	numPeople: 8,
 	basePersonSpeed: 1.4
 },
 {
 	sky: {
-		color: '#005699',
+		color: '#FFCE93',
 		height: 140
 	},
 	land: {
-		color: '#5B5B33',
+		color: '#A0A05B',
 		height: 110
 	},
 	noise: {
 		speed: -2.3,
 		depth: 0.3,
-		backgroundColor: 'rgb(145, 145, 145)'
+		backgroundColor: 'rgb(6, 0, 40)'
 	},
 	numPeople: 8,
 	basePersonSpeed: 1.4	
@@ -242,26 +299,6 @@ function tick(e) {
 	}
 
 	if (player.x > Globals.stageWidth) gotoScreen(currentScreenIndex + 1, 10, player.y);
-
-	for (var objectIndex in currentScreen.objects) {
-		var object = currentScreen.objects[objectIndex];
-
-		var collides = false;
-
-		var topLeft = player.localToLocal(0, 0, object);
-		var topRight = player.localToLocal(player.width, 0, object);
-		var bottomLeft = player.localToLocal(0, player.height, object);
-		var bottomRight = player.localToLocal(player.width, player.height, object);
-
-		if (object.hitTest(topLeft.x, topLeft.y) ||
-			object.hitTest(topRight.x, topRight.y) ||
-			object.hitTest(bottomLeft.x, bottomLeft.y) ||
-			object.hitTest(bottomRight.x, bottomRight.y)) {
-			player.x -= pdX;
-			player.y -= pdY;
-		}
-	}
-
 
 	currentScreen.tick(e);
 
