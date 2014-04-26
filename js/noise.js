@@ -1,25 +1,30 @@
 (function (window) {
-	function Noise() {
-		this.initialize();
+	function Noise(data) {
+		this.initialize(data);
 	}
 
 	var p = Noise.prototype = new createjs.Container();
+
+	p.depth;
+	p.speed;
 
 	p.bg;
 	p.blocks = [];
 
 	p.container_initialize = p.initialize;
 
-	p.initialize = function () {
+	p.initialize = function (data) {
 		this.container_initialize();
 
-		this.make();
+		this.depth = data.depth;
+		this.speed = data.speed;
+		this.make(data);
 	}
 
-	p.make = function () {
+	p.make = function (data) {
 		var bg = new createjs.Shape();
 
-		bg.graphics.beginFill('rgb(145, 145, 145)')
+		bg.graphics.beginFill(data.backgroundColor)
 	               .rect(0,0, Globals.stageWidth, Globals.stageHeight - 100);
 
 		this.addChild(bg);
@@ -29,17 +34,17 @@
 		var dX = Globals.stageWidth / (hBlocks + 1);
 		var dY = (Globals.stageHeight - 100) / (vBlocks + 1);
 
-		for (var h = -3 ; h < hBlocks; h++) {
+		for (var h = -1 ; h < hBlocks + 1; h++) {
 			for (var v = 0 ; v < vBlocks; v++) {
-				if (Math.random() > 0.7) continue;
+				if (Math.random() > 0.6) continue;
 
 				var block = new createjs.Shape();
 				block.rotation = (Math.random() - 0.5) * 30;
-				block.alpha = (Math.random() * 0.6) + 0.4;
+				block.alpha = (Math.random() * 0.6) + 0.2;
 
-				var size = Globals.blockSize * (1.5 + Math.random() * 1);
+				var size = Globals.blockSize * (1.5 + Math.random() * 1) * ((v / vBlocks) + 0.8);
 
-				block.graphics.beginFill('gray')
+				block.graphics.beginFill(createjs.Graphics.getRGB(255, 255, 255))
 			                  .rect(-(size/2), -(size/2), size, size);
 	
 
@@ -57,7 +62,7 @@
 		for (var i = this.blocks.length - 1; i >= 0; i--) {
 			var block = this.blocks[i];
 
-			block.x += (1 + ((Math.random() - 0.5) * 2));
+			block.x += (this.speed + ((Math.random() - 0.5) * (this.speed * 2)));
 			block.y += ((Math.random() - 0.5) * 1);
 
 			block.rotation += (Math.random() - 0.5);
@@ -74,6 +79,9 @@
 			if (block.x > Globals.stageWidth + 50) {
 				block.x = -50;
 			}
+
+			if (block.x < -20)
+				block.x = Globals.stageWidth + 20;
 		};
 	}
 

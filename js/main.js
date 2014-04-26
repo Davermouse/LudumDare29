@@ -23,6 +23,8 @@ var inputState = {
 	downDown: false
 };
 
+var playerSpeed = 20;
+
 var stage;
 var bg;
 var player;
@@ -36,37 +38,109 @@ var land;
 var screens = [
 {
 	sky: {
-		color: 'blue',
-		height: 100
+		color: 'rgb(0, 143, 255)',
+		height: 200
 	},
 	land: {
 		color: 'rgb(0,60,0)',
-		height: 70
+		height: 180
 	},
 	noise: {
-		backgroundColor: 'rgb(145, 145, 145)'
+		depth: 0.2,
+		speed: -1,
+		backgroundColor: 'darkblue'
 	},
 	player: {
 		startX: 50,
 		startY: 80
-	}
+	},
+	numPeople: 18,
+	basePersonSpeed: 1
 },
 {
 	sky: {
-		color: 'pink',
-		height: 100
+		color: 'rgb(0, 121, 216)',
+		height: 190
 	},
 	land: {
-		color: 'rgb(0,60,0)',
-		height: 70
+		color: 'rgb(48, 60, 0)',
+		height: 160
 	},
 	noise: {
+		speed: -1.2,
+		depth: 0.3,
 		backgroundColor: 'rgb(145, 145, 145)'
 	},
-	player: {
-		startX: 20,
-		startY: 120
-	}
+	numPeople: 15,
+	basePersonSpeed: 1.2
+},
+{
+	sky: {
+		color: 'rgb(0, 108, 192)',
+		height: 170
+	},
+	land: {
+		color: 'rgb(60,60,0)',
+		height: 150
+	},
+	noise: {
+		speed: -1.5,
+		depth: 0.3,
+		backgroundColor: 'rgb(145, 145, 145)'
+	},
+	numPeople: 12,
+	basePersonSpeed: 1.4
+},
+{
+	sky: {
+		color: '#005699',
+		height: 160
+	},
+	land: {
+		color: '#5B5B33',
+		height: 130
+	},
+	noise: {
+		speed: -1.9,
+		depth: 0.3,
+		backgroundColor: 'rgb(145, 145, 145)'
+	},
+	numPeople: 10,
+	basePersonSpeed: 1.4
+},
+{
+	sky: {
+		color: '#005699',
+		height: 140
+	},
+	land: {
+		color: '#5B5B33',
+		height: 110
+	},
+	noise: {
+		speed: -2.3,
+		depth: 0.3,
+		backgroundColor: 'rgb(145, 145, 145)'
+	},
+	numPeople: 8,
+	basePersonSpeed: 1.4
+},
+{
+	sky: {
+		color: '#005699',
+		height: 140
+	},
+	land: {
+		color: '#5B5B33',
+		height: 110
+	},
+	noise: {
+		speed: -2.3,
+		depth: 0.3,
+		backgroundColor: 'rgb(145, 145, 145)'
+	},
+	numPeople: 8,
+	basePersonSpeed: 1.4	
 }
 ];
 
@@ -75,6 +149,7 @@ function go() {
 	document.onkeyup = keyUpHandler;
 
 	stage = new createjs.Stage('theCanvas');
+	player = new Person();
 
 	buildScreen(screens[0]);
 
@@ -91,68 +166,72 @@ function buildScreen(screenData) {
 	currentScreen = new Screen(screenData);
 	stage.addChild(currentScreen);
 
-	/*
-	
-	bg = new createjs.Shape();
-	bg.graphics.beginFill('blue').rect(0, 0, 1, 1);
-	bg.scaleX = Globals.stageWidth;
-	bg.scaleY = Globals.stageHeight;
-
-	stage.addChild(bg);
-
-	land = new createjs.Container();
-	var landBg = new createjs.Shape();
-	landBg.graphics.beginFill('rgb(0, 60, 0)')
-	      .rect(0, 0,  Globals.stageWidth, 50);
-	land.addChild(landBg);
-
-	land.x = 0;
-	land.y = 60;
-
-	stage.addChild(land);
-
-	noise = new Noise;
-	noise.x = 0;
-	noise.y = 100;
-
-	stage.addChild(noise);
-*/
 	if (player) {
 		stage.removeChild(player);
 	}
 
-	player = new Player();
-
-	player.x = screenData.player.startX;
-	player.y = screenData.player.startY;
+	if (screenData.player) {
+		player.x = screenData.player.startX;
+		player.y = screenData.player.startY;
+	}
 
 	stage.addChild(player);
 }
 
-function gotoNextScreen() {
-	currentScreenIndex++;
-	this.buildScreen(screens[currentScreenIndex]);
+function gotoScreen(index, playerX, playerY) {
+	currentScreenIndex = index;
+	this.buildScreen(screens[index]);
+
+	if (playerX) {
+		player.x = playerX;
+		player.y = playerY;
+	}
 }
 
 function tick(e) {
+	var pdX = 0;
+	var pdY = 0;
+
 	if (inputState.leftDown) {
-		player.x -= 2;
+		pdX -= playerSpeed;
 	} else if (inputState.rightDown) {
-		player.x += 2;
+		pdX += playerSpeed;
 	}
 
 	if (inputState.upDown) {
-		player.y -= 2;
+		pdY -= playerSpeed;
 	} else if (inputState.downDown) {
-		player.y += 2;
+		pdY += playerSpeed;
 	}
 
-	if (player.y < currentScreen.sky.height - player.height) {
-		player.y = currentScreen.sky.height - player.height;
+	var distanceFromShore = player.y + player.height - currentScreen.sky.height - currentScreen.land.height;
+
+	if (distanceFromShore > 0) {
+		pdX += currentScreen.noise.speed;
+
+		var currentDepth = (distanceFromShore / Globals.blockSize) * currentScreen.noise.depth;
+
+		player.depth = currentDepth;
+	} else {
+		player.depth = 0;
 	}
 
-	if (player.x < 0) player.x = 0;
-	if (player.x > Globals.stageWidth) gotoNextScreen();
+	player.x += pdX;
+	player.y += pdY;
+
+	if (player.y < currentScreen.sky.height - player.height + 5) {
+		player.y = currentScreen.sky.height - player.height + 5;
+	}
+
+	if (player.x < 10) {
+		if (currentScreenIndex == 0)
+			player.x = 10;
+		else 
+			gotoScreen(currentScreenIndex - 1, Globals.stageWidth - 10, player.y);
+	}
+
+	if (player.x > Globals.stageWidth) gotoScreen(currentScreenIndex + 1, 10, player.y);
+
 
 	player.tick();
 	currentScreen.tick(e);
