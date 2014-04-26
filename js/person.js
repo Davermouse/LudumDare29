@@ -1,6 +1,6 @@
 (function (window) {
-	function Person(data) {
-		this.initialize(data);
+	function Person(data, screen) {
+		this.initialize(data, screen);
 	}
 
 	var p = Person.prototype = new createjs.Container();
@@ -45,12 +45,18 @@
 	p.bTopColor;
 	p.bBottomColor;
 
+	p.dX;
+	p.dY;
+
 	p.container_initialize = p.initialize;
 
-	p.initialize = function (data) {
+	p.initialize = function (data, screen) {
 		this.container_initialize();
 
+		this.screen = screen;
 		this.depth = 0;
+		this.dX = 0;
+		this.dY = 0;
 
 		if (!data) {
 			this.randomise();
@@ -126,7 +132,43 @@
 	}
 
 	p.tick = function () {
+		var distanceFromShore = this.y + this.height - this.screen.sky.height - this.screen.land.height;
+
+		if (distanceFromShore > 0) {
+			this.dX += this.screen.noise.speed;
+
+			var currentDepth = (distanceFromShore / Globals.blockSize) * this.screen.noise.depth;
+
+			this.depth = currentDepth;
+		} else {
+			this.depth = 0;
+		}
+
 		this.make();
+
+		this.y += this.dY;
+		this.x += this.dX;
+
+		for (var objectIndex in this.screen.objects) {
+			var object = this.screen.objects[objectIndex];
+
+			var topLeft = this.localToLocal(0, 0, object);
+			var topRight = this.localToLocal(this.width, 0, object);
+			var bottomLeft = this.localToLocal(0, this.height, object);
+			var bottomRight = this.localToLocal(this.width, this.height, object);
+
+			if (object.hitTest(topLeft.x, topLeft.y) ||
+				object.hitTest(topRight.x, topRight.y) ||
+				object.hitTest(bottomLeft.x, bottomLeft.y) ||
+				object.hitTest(bottomRight.x, bottomRight.y)) {
+				this.x -= this.dX;
+				this.y -= this.dY;
+			}
+		}
+
+		if (this.y < this.screen.sky.height - this.height + 5) {
+			this.y = this.screen.sky.height - this.height + 5;
+		}
 	}
 
 	window.Person = Person;

@@ -12,6 +12,8 @@
 
 	p.people;
 
+	p.objects;
+
 	p.container_initialize = p.initialize;
 
 	p.initialize = function (data) {
@@ -40,12 +42,21 @@
 		this.people = [];
 
 		for (var i = 0; i < data.numPeople * 0.6 ; i++) {
-			var person = new Person();
-			person.x = Math.random() * Globals.stageWidth;
-			person.y = data.sky.height + Math.random() * data.land.height - person.height;
+			this.spawnPerson(true);
+		}
 
-			this.people.push(person);
-			this.addChild(person);
+		this.objects = [];
+		data.objects = data.objects || [];
+
+		for (var i = 0 ; i < data.objects.length ; i++) {
+			var objectData = data.objects[i];
+
+			if (objectData.type == 'obstacle') {
+				var obstacle = new Obstacle(objectData);
+
+				this.objects.push(obstacle);
+				this.addChild(obstacle);
+			}
 		}
 	}
 
@@ -54,29 +65,11 @@
 
 		for (var i = this.people.length - 1; i >= 0; i--) {
 			var person = this.people[i];
-			var pDx = person.baseSpeed;
 
-			person.tick(e);			
+			person.dX = person.baseSpeed
+			person.dY = (Math.random() - 0.5) * person.baseSpeed;
 			
-			person.y += (Math.random() - 0.5) * person.baseSpeed ;
-
-			if (person.y < this.sky.height - person.height) {
-				person.y = this.sky.height - person.height;
-			}
-
-			var distanceFromShore = person.y + person.height - this.sky.height - this.land.height;
-
-			if (distanceFromShore > 0) {
-				var currentDepth = (distanceFromShore / Globals.blockSize) * this.noise.depth;
-
-				person.depth = currentDepth;
-				pDx += this.noise.speed;
-			} else {
-				person.depth = 0;
-			}
-
-			person.x += pDx;
-
+			person.tick(e);
 
 			if (person.x > Globals.stageWidth) {
 				this.people.splice(i, 1);
@@ -90,7 +83,7 @@
 	}
 
 	p.spawnPerson = function (fromAnywhere) {
-		var person = new Person();
+		var person = new Person(null, this);
 		if (fromAnywhere) {
 			person.x = Math.random() * Globals.stageWidth;
 		} else {

@@ -50,6 +50,26 @@ var screens = [
 		speed: -1,
 		backgroundColor: 'darkblue'
 	},
+	objects: [
+		{
+			type: 'obstacle',
+			x: 0.8 * Globals.stageWidth,
+			y: 430,
+			width: 60,
+			height: 60,
+			rotation: 20,
+			color: 'gray'
+		},
+		{
+			type: 'obstacle',
+			x: 0.2 * Globals.stageWidth,
+			y: 455,
+			width: 30,
+			height: 40,
+			rotation: 70,
+			color: 'gray'
+		}
+	],
 	player: {
 		startX: 50,
 		startY: 80
@@ -88,6 +108,13 @@ var screens = [
 		depth: 0.3,
 		backgroundColor: 'rgb(145, 145, 145)'
 	},
+	objects: [
+		{
+			x: 0.8 * Globals.StageWidth,
+			y: 400,
+			color: 'gray'
+		}
+	],
 	numPeople: 12,
 	basePersonSpeed: 1.4
 },
@@ -174,6 +201,7 @@ function buildScreen(screenData) {
 		player.x = screenData.player.startX;
 		player.y = screenData.player.startY;
 	}
+	player.screen = currentScreen;
 
 	stage.addChild(player);
 }
@@ -189,39 +217,22 @@ function gotoScreen(index, playerX, playerY) {
 }
 
 function tick(e) {
-	var pdX = 0;
-	var pdY = 0;
+	player.dX = 0;
+	player.dY = 0;
 
 	if (inputState.leftDown) {
-		pdX -= playerSpeed;
+		player.dX -= playerSpeed;
 	} else if (inputState.rightDown) {
-		pdX += playerSpeed;
+		player.dX += playerSpeed;
 	}
 
 	if (inputState.upDown) {
-		pdY -= playerSpeed;
+		player.dY -= playerSpeed;
 	} else if (inputState.downDown) {
-		pdY += playerSpeed;
+		player.dY += playerSpeed;
 	}
 
-	var distanceFromShore = player.y + player.height - currentScreen.sky.height - currentScreen.land.height;
-
-	if (distanceFromShore > 0) {
-		pdX += currentScreen.noise.speed;
-
-		var currentDepth = (distanceFromShore / Globals.blockSize) * currentScreen.noise.depth;
-
-		player.depth = currentDepth;
-	} else {
-		player.depth = 0;
-	}
-
-	player.x += pdX;
-	player.y += pdY;
-
-	if (player.y < currentScreen.sky.height - player.height + 5) {
-		player.y = currentScreen.sky.height - player.height + 5;
-	}
+	player.tick();
 
 	if (player.x < 10) {
 		if (currentScreenIndex == 0)
@@ -232,8 +243,26 @@ function tick(e) {
 
 	if (player.x > Globals.stageWidth) gotoScreen(currentScreenIndex + 1, 10, player.y);
 
+	for (var objectIndex in currentScreen.objects) {
+		var object = currentScreen.objects[objectIndex];
 
-	player.tick();
+		var collides = false;
+
+		var topLeft = player.localToLocal(0, 0, object);
+		var topRight = player.localToLocal(player.width, 0, object);
+		var bottomLeft = player.localToLocal(0, player.height, object);
+		var bottomRight = player.localToLocal(player.width, player.height, object);
+
+		if (object.hitTest(topLeft.x, topLeft.y) ||
+			object.hitTest(topRight.x, topRight.y) ||
+			object.hitTest(bottomLeft.x, bottomLeft.y) ||
+			object.hitTest(bottomRight.x, bottomRight.y)) {
+			player.x -= pdX;
+			player.y -= pdY;
+		}
+	}
+
+
 	currentScreen.tick(e);
 
 	stage.update(e);
