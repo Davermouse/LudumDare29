@@ -1,0 +1,26 @@
+(function (window) {
+	function Class() {
+		this.initialize();
+	}
+
+	var p = Class.prototype = new createjs.Container();
+
+	p.container_initialize = p.initialize;
+
+	p.initialize = function () {
+		this.container_initialize();
+
+
+		this.make();
+
+	}
+
+	p.make = function () {
+	}
+
+	p.tick = function () {
+		
+	}
+
+	window.Class = Class;
+})(window);
