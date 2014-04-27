@@ -15,12 +15,18 @@
 	p.blocks = [];
 	p.flots = [];
 
+	p.flotSpawnTime;
+
 	p.container_initialize = p.initialize;
 
 	p.initialize = function (data) {
 		this.container_initialize();
 
-		this.height = Globals.stageHeight - this.screen.data.sky.height - this.screen.data.land.height;
+		this.height = Globals.stageHeight;
+
+		if (this.screen.data.sky) this.height -= this.screen.data.sky.height;
+		if (this.screen.data.land) this.height -= this.screen.data.land.height;
+		
 		this.depth = data.depth;
 		this.speed = data.speed;
 		this.make(data);
@@ -35,7 +41,7 @@
 		this.addChild(bg);
 
 		var hBlocks = 10;
-		var vBlocks = Math.floor(this.height / 15);
+		var vBlocks = Math.floor(this.height / 20);
 		var dX = Globals.stageWidth / (hBlocks + 1);
 		var dY = this.height / (vBlocks + 1);
 
@@ -65,6 +71,8 @@
 		for (var i = 0; i < this.data.flotCount / 2; i++) {
 			this.spawnFlot(true);
 		}
+
+		this.flotSpawnTime = createjs.Ticker.getTime() + (Math.abs(this.data.speed) * (5000 + Math.random() * 5000));
 	}
 
 	p.tick = function (e) {
@@ -104,24 +112,32 @@
 				this.flots.splice(i, 1);
 				this.removeChild(flot);
 
-				var sI = createjs.indexOf(flot,this.screen.objects);
+				var sI = createjs.indexOf(this.screen.objects, flot);
 				this.screen.objects.splice(sI, 1);
+
+				console.log('remove flot, object count: ' + this.screen.objects.length);
 			}
 		};
 
 		if (this.flots.length < this.data.flotCount &&
-			Math.random() > 0.999) {
+			createjs.Ticker.getTime() > this.flotSpawnTime) {
 			this.spawnFlot(false);
+
+			this.flotSpawnTime = createjs.Ticker.getTime() + ((5000 + Math.random() * 10000) / Math.abs(this.data.speed));
 		}
 	}
 
 	p.spawnFlot = function (anywhere) {
 		var flot = new Flot({ width: 50, height: 50, color: 'brown' }, this.screen);
 
-		if (this.speed < 0) 
-			flot.x = Globals.stageWidth + 50;
-		else 
-			flot.x = -50;
+		if (anywhere) {
+			flot.x = Math.random() * Globals.stageWidth;
+		} else {
+			if (this.speed < 0) 
+				flot.x = Globals.stageWidth + 50;
+			else 
+				flot.x = -50;
+		}
 
 		flot.y = 25 + Math.random() * (this.height - 50);
 		flot.dTheta = Math.random() * 0.1;
@@ -129,6 +145,7 @@
 		this.flots.push(flot);
 		this.addChild(flot);
 		this.screen.objects.push(flot);	
+		console.log('added flot, object count: ' + this.screen.objects.length);
 	}
 
 	window.Noise = Noise;

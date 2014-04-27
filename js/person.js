@@ -139,7 +139,7 @@
 	p.tick = function () {
 		var finalDx = this.dX;
 
-		var distanceFromShore = this.y + this.height - this.screen.sky.height - this.screen.land.height;
+		var distanceFromShore = this.y + this.height - (this.screen.sky ? this.screen.sky.height : 0) - (this.screen.land ?  this.screen.land.height: 0);
 
 		if (distanceFromShore > 0) {
 			var currentDepth = (distanceFromShore / Globals.blockSize) * this.screen.noise.depth;
@@ -169,8 +169,8 @@
 		this.y += this.dY;
 		this.x += finalDx;
 
-		if (this.y < this.screen.sky.height - this.height + 5) {
-			this.y = this.screen.sky.height - this.height + 5;
+		if (this.y < (this.screen.sky ? this.screen.sky.height : 0) - this.height + 5) {
+			this.y = (this.screen.sky ? this.screen.sky.height : 0) - this.height + 5;
 		}
 	}
 

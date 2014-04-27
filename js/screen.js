@@ -27,19 +27,25 @@
 
 		this.objects = [];
 
-		this.sky = new Sky(data.sky);
-		this.addChild(this.sky);
+		if (data.sky) {
+			this.sky = new Sky(data.sky);
+			this.addChild(this.sky);
+		}
 
-		this.land = new Land(data.land);
-		this.land.y = data.sky.height;
+		if (data.land) {
+			this.land = new Land(data.land);
+			this.land.y = data.sky.height;
 
-		this.addChild(this.land);
+			this.addChild(this.land);
+		}
 
-		this.noise = new Noise(data.noise, this);
-		this.noise.x = 0;
-		this.noise.y = data.sky.height + data.land.height;		
+		if (data.noise) {
+			this.noise = new Noise(data.noise, this);
+			this.noise.x = 0;
+			this.noise.y = 0 + (data.sky ? data.sky.height : 0) + (data.land ?  data.land.height: 0);		
 
-		this.addChild(this.noise);
+			this.addChild(this.noise);
+		}
 
 		this.people = [];
 
@@ -98,7 +104,6 @@
 
 		for (var i = this.objects.length - 1; i >= 0; i--) {
 			var objectA = this.objects[i];
-
 			var objectAPts = objectA.getPoints();
 
 			var axis1 = {x: objectAPts[0].x - objectAPts[1].x,
@@ -153,14 +158,33 @@
 									y: centerA.y - centerB.y
 								};
 
-								if (!objectA.isFixed) {
-									objectA.x += d.x * 0.1;
-									objectA.y += d.y * 0.1;
+								var obstacle = null;
+								var person = null;
+								if (objectA instanceof Obstacle &&
+									objectB instanceof Person) {
+									obstacle = objectA;
+									person = objectB;
 								}
 
-								if (!objectB.isFixed) {
-									objectB.x -= d.x * 0.05;
-									objectB.y -= d.y * 0.05;
+								if (objectB instanceof Obstacle &&
+									objectA instanceof Person) {
+									obstacle = objectB;
+									person = objectA;
+								}
+
+								if (person != null) {
+									person.x -= person.dX;
+									person.y += 0.1 - person.dY;
+								} else {
+									if (!objectA.isFixed) {
+										objectA.x += d.x * 0.1;
+										objectA.y += d.y * 0.1;
+									}
+
+									if (!objectB.isFixed) {
+										objectB.x -= d.x * 0.1;
+										objectB.y -= d.y * 0.1;
+									}
 								}
 /*
 								if (objectA instanceof Person &&

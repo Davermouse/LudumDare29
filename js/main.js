@@ -85,7 +85,7 @@ var screens = [
 			type: 'text',
 			x: 50,
 			y: 50,
-			text: "'Beneath the surface?'",
+			text: "Beneath its surface",
 			color: 'white'
 		}
 	],
@@ -115,14 +115,14 @@ var screens = [
 			type: 'text',
 			x: 50,
 			y: 50,
-			text: "'Beneath the surface?'",
+			text: "Beneath its surface",
 			color: 'rgb(200,200,200)'
 		},
 		{
 			type: 'text',
 			x: 70,
 			y: 90,
-			text: "It was a reasonable question.",
+			text: "Lay the Idea",
 			color: 'white'
 		}/*,{
 			type: 'obstacle',
@@ -157,7 +157,8 @@ var screens = [
 	noise: {
 		speed: -1.5,
 		depth: 0.3,
-		backgroundColor: 'rgb(14,0, 85)'
+		backgroundColor: 'rgb(14,0, 85)',
+		flotCount: 3
 	},
 	objects: [
 		{
@@ -181,15 +182,23 @@ var screens = [
 	noise: {
 		speed: -1.9,
 		depth: 0.3,
-		backgroundColor: 'rgb(10,0, 70)'
+		backgroundColor: 'rgb(10,0, 70)',
+		flotCount: 3
 	},
 	objects: [
 	{
 		type: 'text',
-		x: 60,
-		y: 60,
-		text: 'But maybe one for a simpler time',
+		x: 70,
+		y: 70,
+		text: 'Expressed through novel gameplay',
 		color: 'white'
+	},
+	{
+		type: 'text',
+		x: 50,
+		y: 40,
+		text: "The Idea",
+		color: 'lightgray'
 	}
 	],
 	numPeople: 10,
@@ -207,8 +216,25 @@ var screens = [
 	noise: {
 		speed: -2.3,
 		depth: 0.3,
-		backgroundColor: 'rgb(6, 0, 55)'
+		backgroundColor: 'rgb(6, 0, 55)',
+		flotCount: 5
 	},
+	objects: [
+	{
+		type: 'text',
+		x: 70,
+		y: 70,
+		text: 'Displayed through beautiful graphics',
+		color: 'white'
+	},
+	{
+		type: 'text',
+		x: 50,
+		y: 40,
+		text: "The Idea",
+		color: 'gray'
+	}
+	],
 	numPeople: 8,
 	basePersonSpeed: 1.4
 },
@@ -224,8 +250,25 @@ var screens = [
 	noise: {
 		speed: -2.8,
 		depth: 0.3,
-		backgroundColor: 'rgb(6, 0, 40)'
+		backgroundColor: 'rgb(6, 0, 40)',
+		flotCount: 4
 	},
+	objects: [
+	{
+		type: 'text',
+		x: 70,
+		y: 70,
+		text: 'Audible through great sound',
+		color: 'white'
+	},
+	{
+		type: 'text',
+		x: 50,
+		y: 40,
+		text: "The Idea",
+		color: 'gray'
+	}
+	],
 	numPeople: 6,
 	basePersonSpeed: 1.4	
 },
@@ -241,7 +284,8 @@ var screens = [
 	noise: {
 		speed: -3.5,
 		depth: 0.3,
-		backgroundColor: 'rgb(3, 0, 35)'
+		backgroundColor: 'rgb(3, 0, 35)',
+		flotCount: 6
 	},
 	numPeople: 4,
 	basePersonSpeed: 1.4	
@@ -258,16 +302,17 @@ var screens = [
 	noise: {
 		speed: -4,
 		depth: 0.3,
-		backgroundColor: 'rgb(3, 0, 35)'
+		backgroundColor: 'rgb(3, 0, 35)',
+		flotCount: 7
 	},
 	objects: [
 	{
 		type: 'obstacle',
-		x: 100,
-		y: 110,
+		x: 85,
+		y: 100,
 		rotation: 0,
-		width: 35,
-		height: 35,
+		width: 50,
+		height: 50,
 		color: 'AC2D2D'
 	},
 		{
@@ -324,6 +369,13 @@ var screens = [
 		width: 45,
 		height: 45,
 		color: 'AC2D2D'
+	},
+	{
+		type: 'text',
+		x: 50,
+		y: 30,
+		color: 'white',
+		text: 'But the real struggle'
 	}
 	],
 	numPeople: 3,
@@ -341,7 +393,8 @@ var screens = [
 	noise: {
 		speed: -5,
 		depth: 0.1,
-		backgroundColor: 'rgb(3, 0, 35)'
+		backgroundColor: 'rgb(3, 0, 35)',
+		flotCount: 10
 	},
 	objects: [
 	],
@@ -360,12 +413,82 @@ var screens = [
 	noise: {
 		speed: -7,
 		depth: 0.1,
-		backgroundColor: 'rgb(3, 0, 35)'
+		backgroundColor: 'rgb(3, 0, 35)',
+		flotCount: 14
 	},
 	objects: [
+	{
+		type: 'obstacle',
+		x: 520,
+		y: 100,
+		rotation: 0,
+		width: 30,
+		height: 30,
+		color: 'AC2D2D'
+	},
+	{
+		type: 'obstacle',
+		x: 570,
+		y: 85,
+		rotation: 0,
+		width: 45,
+		height: 45,
+		color: 'AC2D2D'
+	},
+	{
+		type: 'text',
+		x: 50,
+		y: 40,
+		color: 'white',
+		text: 'Is that initial idea'
+	}
 	],
 	numPeople: 4,
 	basePersonSpeed: 1.4	
+},
+{
+	sky: {
+		color: '#FF743D',
+		height: 105
+	},
+	land: {
+		color: '#BCBC6B',
+		height: 5
+	},
+	noise: {
+		speed: -7,
+		depth: 0.1,
+		backgroundColor: 'rgb(3, 0, 35)',
+		flotCount: 18
+	},
+	objects: [
+	{
+		type: 'text',
+		x: 50,
+		y: 40,
+		color: 'white',
+		text: "This isn't that game"
+	}
+	],
+	numPeople: 2,
+	basePersonSpeed: 1.4	
+},
+{
+	noise: {
+		speed: -10,
+		depth: 0.01,
+		backgroundColor: 'rgb(1, 0, 15)'
+	},
+	objects: [
+	{
+		type: 'text',
+		x: 300,
+		y: 230,
+		color: 'white',
+		text: 'The End'
+	}
+	],
+	numPeople: 0
 }
 ];
 
@@ -441,7 +564,13 @@ function tick(e) {
 			gotoScreen(currentScreenIndex - 1, Globals.stageWidth - 10, player.y);
 	}
 
-	if (player.x > Globals.stageWidth) gotoScreen(currentScreenIndex + 1, 10, player.y);
+	if (player.x > Globals.stageWidth) {
+		if (currentScreenIndex + 1 < this.screens.length) {
+			gotoScreen(currentScreenIndex + 1, 10, player.y);	
+		} else {
+			player.x = Globals.stageWidth;
+		}
+	} 
 
 	currentScreen.tick(e);
 
