@@ -11,6 +11,7 @@
 	p.initialize = function (data) {
 		this.container_initialize();
 
+		this.isFixed = true;
 		this.data = data;
 
 		this.make();
@@ -32,6 +33,15 @@
 
 	p.tick = function () {
 		
+	}
+
+	p.getPoints = function () {
+		return [
+			this.localToGlobal(0, 0),
+			this.localToGlobal(this.data.width, 0),
+			this.localToGlobal(this.data.width, this.data.height),
+			this.localToGlobal(0, this.data.height)
+		];
 	}
 
 	window.Obstacle = Obstacle;

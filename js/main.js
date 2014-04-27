@@ -23,11 +23,13 @@ var inputState = {
 	downDown: false
 };
 
-var playerSpeed = 20;
+var playerSpeed = 5;
 
 var stage;
 var bg;
 var player;
+
+var initialScreenIndex = 0;
 
 var currentScreen;
 var currentScreenIndex = 0;
@@ -48,9 +50,10 @@ var screens = [
 	noise: {
 		depth: 0.2,
 		speed: -1,
-		backgroundColor: 'darkblue'
+		backgroundColor: 'darkblue',
+		flotCount: 2
 	},
-	objects: [
+	objects: [/*
 		{
 			type: 'obstacle',
 			x: 0.8 * Globals.stageWidth,
@@ -58,7 +61,7 @@ var screens = [
 			width: 60,
 			height: 60,
 			rotation: 20,
-			color: 'gray'
+			color: 'rgb(60,60,60)'
 		},
 		{
 			type: 'obstacle',
@@ -77,7 +80,7 @@ var screens = [
 			height: 20,
 			rotation: 39,
 			color: 'gray'
-		},
+		},*/
 		{
 			type: 'text',
 			x: 50,
@@ -121,14 +124,14 @@ var screens = [
 			y: 90,
 			text: "It was a reasonable question.",
 			color: 'white'
-		},{
+		}/*,{
 			type: 'obstacle',
 			x: 0.5 * Globals.stageWidth,
 			y: 420,
 			width: 60,
 			height: 60,
 			rotation: 25,
-			color: 'darkgray'
+			color: 'rgb(60,60,60)'
 		},{
 			type: 'obstacle',
 			x: 0.2 * Globals.stageWidth,
@@ -137,7 +140,7 @@ var screens = [
 			height: 70,
 			rotation: 36,
 			color: 'darkgray'
-		}
+		}*/
 	],
 	numPeople: 15,
 	basePersonSpeed: 1.2
@@ -212,18 +215,156 @@ var screens = [
 {
 	sky: {
 		color: '#FFCE93',
-		height: 140
+		height: 130
 	},
 	land: {
 		color: '#A0A05B',
-		height: 110
+		height: 90
 	},
 	noise: {
-		speed: -2.3,
+		speed: -2.8,
 		depth: 0.3,
 		backgroundColor: 'rgb(6, 0, 40)'
 	},
-	numPeople: 8,
+	numPeople: 6,
+	basePersonSpeed: 1.4	
+},
+{
+	sky: {
+		color: '#FF743D',
+		height: 115
+	},
+	land: {
+		color: '#BCBC6B',
+		height: 65
+	},
+	noise: {
+		speed: -3.5,
+		depth: 0.3,
+		backgroundColor: 'rgb(3, 0, 35)'
+	},
+	numPeople: 4,
+	basePersonSpeed: 1.4	
+},
+{
+	sky: {
+		color: '#FF743D',
+		height: 105
+	},
+	land: {
+		color: '#BCBC6B',
+		height: 55
+	},
+	noise: {
+		speed: -4,
+		depth: 0.3,
+		backgroundColor: 'rgb(3, 0, 35)'
+	},
+	objects: [
+	{
+		type: 'obstacle',
+		x: 100,
+		y: 110,
+		rotation: 0,
+		width: 35,
+		height: 35,
+		color: 'AC2D2D'
+	},
+		{
+		type: 'obstacle',
+		x: 140,
+		y: 135,
+		rotation: 0,
+		width: 20,
+		height: 20,
+		color: 'c13131'
+	},
+		{
+		type: 'obstacle',
+		x: 180,
+		y: 95,
+		rotation: 0,
+		width: 50,
+		height: 50,
+		color: '952020'
+	},
+		{
+		type: 'obstacle',
+		x: 250,
+		y: 113,
+		rotation: 0,
+		width: 40,
+		height: 40,
+		color: '892525'
+	},
+		{
+		type: 'obstacle',
+		x: 304,
+		y: 102,
+		rotation: 0,
+		width: 43,
+		height: 43,
+		color: '961919'
+	},
+		{
+		type: 'obstacle',
+		x: 360,
+		y: 115,
+		rotation: 0,
+		width: 23,
+		height: 23,
+		color: 'AC2D2D'
+	},
+	
+		{
+		type: 'obstacle',
+		x: 390,
+		y: 105,
+		rotation: 0,
+		width: 45,
+		height: 45,
+		color: 'AC2D2D'
+	}
+	],
+	numPeople: 3,
+	basePersonSpeed: 1.4	
+},
+{
+	sky: {
+		color: '#FF743D',
+		height: 105
+	},
+	land: {
+		color: '#BCBC6B',
+		height: 45
+	},
+	noise: {
+		speed: -5,
+		depth: 0.1,
+		backgroundColor: 'rgb(3, 0, 35)'
+	},
+	objects: [
+	],
+	numPeople: 4,
+	basePersonSpeed: 1.4	
+},
+{
+	sky: {
+		color: '#FF743D',
+		height: 105
+	},
+	land: {
+		color: '#BCBC6B',
+		height: 30
+	},
+	noise: {
+		speed: -7,
+		depth: 0.1,
+		backgroundColor: 'rgb(3, 0, 35)'
+	},
+	objects: [
+	],
+	numPeople: 4,
 	basePersonSpeed: 1.4	
 }
 ];
@@ -235,7 +376,7 @@ function go() {
 	stage = new createjs.Stage('theCanvas');
 	player = new Person();
 
-	buildScreen(screens[0]);
+	gotoScreen(initialScreenIndex);
 
 	stage.update();
 
@@ -258,8 +399,10 @@ function buildScreen(screenData) {
 		player.x = screenData.player.startX;
 		player.y = screenData.player.startY;
 	}
+
 	player.screen = currentScreen;
 
+	currentScreen.objects.push(player);
 	stage.addChild(player);
 }
 

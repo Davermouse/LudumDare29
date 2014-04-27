@@ -45,6 +45,9 @@
 	p.bTopColor;
 	p.bBottomColor;
 
+	p.energyMax;
+	p.energy;
+
 	p.dX;
 	p.dY;
 
@@ -98,7 +101,9 @@
 		this.bTopColor = createjs.Graphics.getHSL(bodyHue,70,70);
 		this.bBottomColor = createjs.Graphics.getHSL(bodyHue, 50, 70);
 
-		this.baseSpeed = 1 + Math.random() * 3;
+		this.baseSpeed = 2 + Math.random() * 3;
+		this.energyMax = 100 + Math.random() * 200;
+		this.energy = this.energyMax;
 	}
 
 	p.make = function () {
@@ -132,42 +137,71 @@
 	}
 
 	p.tick = function () {
+		var finalDx = this.dX;
+
 		var distanceFromShore = this.y + this.height - this.screen.sky.height - this.screen.land.height;
 
 		if (distanceFromShore > 0) {
-			this.dX += this.screen.noise.speed;
-
 			var currentDepth = (distanceFromShore / Globals.blockSize) * this.screen.noise.depth;
 
 			this.depth = currentDepth;
+			finalDx += this.screen.noise.speed * (this.depth / 2);
 		} else {
 			this.depth = 0;
+		}
+
+		if (this.depth > 1) {
+			this.energy -= 1;
+
+			if (this.energy < 0) this.energy = 0;
+		} else if (this.depth < 0.2) {
+			this.energy += 0.5;
+
+			if (this.energy > this.energyMax) this.energy = this.energyMax;
+		}
+
+		if (this.energy < 10) {
+			finalDx -= this.dX * ((10 - this.energy) / 10);
 		}
 
 		this.make();
 
 		this.y += this.dY;
-		this.x += this.dX;
+		this.x += finalDx;
 
+		if (this.y < this.screen.sky.height - this.height + 5) {
+			this.y = this.screen.sky.height - this.height + 5;
+		}
+	}
+
+	p.getPoints = function () {
+		return [
+			this.localToGlobal(0, 0),
+			this.localToGlobal(this.width, 0),
+			this.localToGlobal(this.width, this.height),
+			this.localToGlobal(0, this.height)
+		];
+	}
+
+	p.collides = function () {
 		for (var objectIndex in this.screen.objects) {
 			var object = this.screen.objects[objectIndex];
 
 			var topLeft = this.localToLocal(0, 0, object);
 			var topRight = this.localToLocal(this.width, 0, object);
+			var midLeft = this.localToLocal(0, this.height / 2, object);
+			var midRight = this.localToLocal(this.width, this.height / 2, object);
 			var bottomLeft = this.localToLocal(0, this.height, object);
 			var bottomRight = this.localToLocal(this.width, this.height, object);
 
 			if (object.hitTest(topLeft.x, topLeft.y) ||
 				object.hitTest(topRight.x, topRight.y) ||
 				object.hitTest(bottomLeft.x, bottomLeft.y) ||
-				object.hitTest(bottomRight.x, bottomRight.y)) {
-				this.x -= this.dX;
-				this.y -= this.dY;
+				object.hitTest(bottomRight.x, bottomRight.y) ||
+				object.hitTest(midLeft.x, midLeft.y) ||
+				object.hitTest(midRight.x, midRight.y)) {
+				return object;
 			}
-		}
-
-		if (this.y < this.screen.sky.height - this.height + 5) {
-			this.y = this.screen.sky.height - this.height + 5;
 		}
 	}
 

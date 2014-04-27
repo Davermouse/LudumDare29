@@ -1,5 +1,8 @@
 (function (window) {
-	function Noise(data) {
+	function Noise(data, screen)
+	{
+		this.screen = screen;		
+		this.data = data;
 		this.initialize(data);
 	}
 
@@ -10,12 +13,14 @@
 
 	p.bg;
 	p.blocks = [];
+	p.flots = [];
 
 	p.container_initialize = p.initialize;
 
 	p.initialize = function (data) {
 		this.container_initialize();
 
+		this.height = Globals.stageHeight - this.screen.data.sky.height - this.screen.data.land.height;
 		this.depth = data.depth;
 		this.speed = data.speed;
 		this.make(data);
@@ -30,9 +35,9 @@
 		this.addChild(bg);
 
 		var hBlocks = 10;
-		var vBlocks = 10;
+		var vBlocks = Math.floor(this.height / 15);
 		var dX = Globals.stageWidth / (hBlocks + 1);
-		var dY = (Globals.stageHeight - 100) / (vBlocks + 1);
+		var dY = this.height / (vBlocks + 1);
 
 		for (var h = -1 ; h < hBlocks + 1; h++) {
 			for (var v = 0 ; v < vBlocks; v++) {
@@ -40,7 +45,7 @@
 
 				var block = new createjs.Shape();
 				block.rotation = (Math.random() - 0.5) * 30;
-				block.alpha = (Math.random() * 0.6) + 0.2;
+				block.alpha = (Math.random() * 0.4) + 0.1;
 
 				var size = Globals.blockSize * (1.5 + Math.random() * 1) * ((v / vBlocks) + 0.8);
 
@@ -55,6 +60,10 @@
 
 				this.blocks.push(block);
 			}
+		}
+
+		for (var i = 0; i < this.data.flotCount / 2; i++) {
+			this.spawnFlot(true);
 		}
 	}
 
@@ -72,7 +81,7 @@
 
 			block.alpha += (Math.random() - 0.5) * 0.05;
 			if (block.alpha < 0.3) block.alpha = 0.3;
-			if (block.alpha > 1) block.alpha = 1;
+			if (block.alpha > 0.6) block.alpha = 0.6;
 
 			if (block.y < 20) block.y = 20;
 
@@ -83,6 +92,43 @@
 			if (block.x < -20)
 				block.x = Globals.stageWidth + 20;
 		};
+
+		for (var i = this.flots.length - 1; i >= 0; i--) {
+			var flot = this.flots[i];
+
+			flot.x += this.speed * 2;
+			flot.rotation += flot.dTheta;
+
+			if (flot.x < -100 ||
+				flot.x > Globals.stageWidth + 100) {
+				this.flots.splice(i, 1);
+				this.removeChild(flot);
+
+				var sI = createjs.indexOf(flot,this.screen.objects);
+				this.screen.objects.splice(sI, 1);
+			}
+		};
+
+		if (this.flots.length < this.data.flotCount &&
+			Math.random() > 0.999) {
+			this.spawnFlot(false);
+		}
+	}
+
+	p.spawnFlot = function (anywhere) {
+		var flot = new Flot({ width: 50, height: 50, color: 'brown' }, this.screen);
+
+		if (this.speed < 0) 
+			flot.x = Globals.stageWidth + 50;
+		else 
+			flot.x = -50;
+
+		flot.y = 25 + Math.random() * (this.height - 50);
+		flot.dTheta = Math.random() * 0.1;
+
+		this.flots.push(flot);
+		this.addChild(flot);
+		this.screen.objects.push(flot);	
 	}
 
 	window.Noise = Noise;
